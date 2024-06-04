@@ -22,101 +22,112 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>Plastic Pollution Index</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="statistics.html">Statistics</a></li>
-                <li><a href="about.html">About Us</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="statistics">
-            <div class="region-menu">
-                <label for="region-select">Select Region:</label>
-                <select id="region-select">
-                    <option value="Georgia, USA">Georgia</option>
-                    <option value="California, USA">California</option>
-                    <option value="New York, USA">New York</option>
-                    <!-- Add more options as needed -->
-                </select>
-                <input type="text" id="custom-region" placeholder="Type custom region">
-                <button id="add-region-btn">Add Region</button>
-            </div>
-            <div class="graph-container">
-                <canvas id="airQualityChart" width="800" height="400"></canvas>
-            </div>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 Plastic Pollution Index</p>
-    </footer>
+<header>
+    <h1>Plastic Pollution Index</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="statistics.html">Statistics</a></li>
+            <li><a href="about.html">About Us</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <section id="statistics">
+        <div class="region-menu">
+            <label for="region-select">Select Region:</label>
+            <select id="region-select">
+                <option value="Georgia, USA">Georgia</option>
+                <option value="California, USA">California</option>
+                <option value="New York, USA">New York</option>
+                <!-- Add more options as needed -->
+            </select>
+            <input type="text" id="custom-region" placeholder="Type custom region">
+            <button id="add-region-btn">Add Region</button>
+        </div>
+        <div class="graph-container">
+            <canvas id="airQualityChart" width="800" height="400"></canvas>
+        </div>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 Plastic Pollution Index</p>
+</footer>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const ctx = document.getElementById('airQualityChart').getContext('2d');
-            const airQualityChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Air Quality Index',
-                        data: [],
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('airQualityChart').getContext('2d');
+        const airQualityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Air Quality Index',
+                    data: [],
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 500,
+                        beginAtZero: true
                     }
                 }
-            });
-
-            const apiKey = '8c59fc25cdbade9a29d0957745f34863'; // OpenWeatherMap API Key
-
-            async function fetchAirQuality(region) {
-                try {
-                    const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?q=${encodeURIComponent(region)}&appid=${apiKey}`;
-                    const response = await fetch(apiUrl);
-                    const data = await response.json();
-
-                    const labels = data.list.map(entry => new Date(entry.dt * 1000).toLocaleDateString());
-                    const values = data.list.map(entry => entry.components.aqi);
-
-                    airQualityChart.data.labels = labels;
-                    airQualityChart.data.datasets[0].data = values;
-                    airQualityChart.update();
-                } catch (error) {
-                    console.error('Error fetching air quality data:', error);
-                    alert('An error occurred while fetching air quality data. Please try again later.');
-                }
             }
-
-            fetchAirQuality('Georgia, USA');
-
-            document.getElementById('add-region-btn').addEventListener('click', function() {
-                const customRegion = document.getElementById('custom-region').value;
-                const regionSelect = document.getElementById('region-select');
-                const option = document.createElement('option');
-                option.value = customRegion;
-                option.textContent = customRegion;
-                regionSelect.appendChild(option);
-                regionSelect.value = customRegion;
-                fetchAirQuality(customRegion);
-            });
-
-            document.getElementById('region-select').addEventListener('change', function() {
-                const selectedRegion = this.value;
-                fetchAirQuality(selectedRegion);
-            });
         });
-    </script>
+
+        const apiKey = '8c59fc25cdbade9a29d0957745f34863'; // OpenWeatherMap API Key
+
+        async function fetchAirQuality(region) {
+            try {
+                const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(region)}&limit=1&appid=${apiKey}`;
+                const geocodeResponse = await fetch(geocodeUrl);
+                const geocodeData = await geocodeResponse.json();
+
+                if (!geocodeData || geocodeData.length === 0) {
+                    throw new Error('Invalid region');
+                }
+
+                const { lat, lon } = geocodeData[0];
+                const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                const labels = data.list.map(entry => new Date(entry.dt * 1000).toLocaleDateString());
+                const values = data.list.map(entry => entry.main.aqi);
+
+                airQualityChart.data.labels = labels;
+                airQualityChart.data.datasets[0].data = values;
+                airQualityChart.update();
+            } catch (error) {
+                console.error('Error fetching air quality data:', error);
+                alert('An error occurred while fetching air quality data. Please try again later.');
+            }
+        }
+
+        fetchAirQuality('Georgia, USA');
+
+        document.getElementById('add-region-btn').addEventListener('click', function() {
+            const customRegion = document.getElementById('custom-region').value;
+            const regionSelect = document.getElementById('region-select');
+            const option = document.createElement('option');
+            option.value = customRegion;
+            option.textContent = customRegion;
+            regionSelect.appendChild(option);
+            regionSelect.value = customRegion;
+            fetchAirQuality(customRegion);
+        });
+
+        document.getElementById('region-select').addEventListener('change', function() {
+            const selectedRegion = this.value;
+            fetchAirQuality(selectedRegion);
+        });
+    });
+</script>
 </body>
 </html>
 
