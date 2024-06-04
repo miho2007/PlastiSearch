@@ -106,11 +106,11 @@
     </div>
 
     <script>
-        document.getElementById('search-button').addEventListener('click', function () {
+       document.getElementById('search-button').addEventListener('click', function () {
             const keyword = document.getElementById('search-input').value.trim();
             if (keyword !== '') {
-                const apiKey = 'f413ca35071f4e9bb6167887368290bd';
-                const apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(keyword)}&apiKey=${apiKey}`;
+                const apiKey = 'b9991b6cd7effbf0a475f212f2ecdca6';
+                const apiUrl = `https://gnews.io/api/v4/search?q=${encodeURIComponent(keyword)}&token=${apiKey}`;
                 fetch(apiUrl)
                     .then(response => response.json())
                     .then(data => {
@@ -120,13 +120,19 @@
                         if (articles.length > 0) {
                             articles.forEach(article => {
                                 const card = document.createElement('div');
-                                card.classList.add('card');
+                                card.classList.add('card', 'mb-3');
                                 card.innerHTML = `
-                                    <img src="${article.urlToImage ? article.urlToImage : 'https://via.placeholder.com/286x180?text=No+Image'}" class="card-img-top" alt="${article.title}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">${article.title}</h5>
-                                        <p class="card-text">${article.description}</p>
-                                        <a href="${article.url}" class="btn btn-primary" target="_blank">Read More</a>
+                                    <div class="row no-gutters">
+                                        <div class="col-md-4">
+                                            <img src="${article.image ? article.image : 'https://via.placeholder.com/150'}" class="card-img" alt="${article.title}">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${article.title}</h5>
+                                                <p class="card-text">${article.description}</p>
+                                                <a href="${article.url}" class="btn btn-primary" target="_blank">Read More</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 `;
                                 searchResults.appendChild(card);
