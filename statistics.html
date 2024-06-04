@@ -65,23 +65,14 @@
                         label: 'Air Quality Index',
                         data: [],
                         fill: false,
-                        borderColor: '#4CAF50', // Green color
-                        backgroundColor: '#4CAF50', // Green color
-                        pointBackgroundColor: '#4CAF50', // Green color
-                        pointBorderColor: '#4CAF50', // Green color
-                        pointHoverBackgroundColor: '#4CAF50', // Green color
-                        pointHoverBorderColor: '#4CAF50', // Green color
-                        borderWidth: 2, // Line width
-                        pointRadius: 5, // Point size
-                        pointHoverRadius: 7, // Point size on hover
-                        tension: 0.2 // Smooth curve
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
                     }]
                 },
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            suggestedMax: 300 // Maximum value on y-axis
+                            beginAtZero: true
                         }
                     }
                 }
@@ -89,7 +80,6 @@
 
             const apiKey = '8c59fc25cdbade9a29d0957745f34863'; // OpenWeatherMap API Key
 
-            // Function to fetch air quality data
             async function fetchAirQuality(region) {
                 try {
                     const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(region)}&limit=1&appid=${apiKey}`;
@@ -117,10 +107,8 @@
                 }
             }
 
-            // Initial fetch for default region
-            fetchAirQuality('Georgia, USA');
+            fetchAirQuality('New York, USA'); // Fetch initial data for New York City
 
-            // Add event listener for the "Add Region" button
             document.getElementById('add-region-btn').addEventListener('click', function() {
                 const customRegion = document.getElementById('custom-region').value;
                 const regionSelect = document.getElementById('region-select');
@@ -132,7 +120,6 @@
                 fetchAirQuality(customRegion);
             });
 
-            // Add event listener for the region select
             document.getElementById('region-select').addEventListener('change', function() {
                 const selectedRegion = this.value;
                 fetchAirQuality(selectedRegion);
@@ -141,4 +128,5 @@
     </script>
 </body>
 </html>
+
 
