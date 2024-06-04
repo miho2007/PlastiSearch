@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plastic Pollution Index - Home</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional CSS for news feed styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('background.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh; /* Ensure the body covers the entire viewport height */
+            position: relative; /* Required for footer positioning */
+        }
+
+        header {
+            background-color: #262F0E; /* Background color without transparency */
+            color: white;
+            text-align: center;
+            padding: 0.5em 0;
+            margin-bottom: 20px; /* Add margin to separate from the content */
+        }
+
+        nav {
+            background-color: #262F0E; /* Background color without transparency */
+            margin: 0; /* Remove any default margin */
+            padding: 0; /* Remove any default padding */
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 14px 20px;
+            display: block;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(17, 17, 17, 0.6);
+        }
+
+        main {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+/* Additional CSS for news feed styling */
+#news-feed {
+    width: calc(100% - 400px); /* Adjust the width as needed */
+    background-color: #262F0E; /* Background color without transparency */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    overflow: hidden; /* Hide overflow */
+}
+
+#news-container {
+    margin-right: -5px; /* Compensate for the padding to align perfectly */
+    padding-right: 5px; /* Adjust this value if necessary */
+}
+
+.swiper-container {
+    width: 100%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    overflow: hidden; /* Add this line to hide overflow */
+}
+
+.swiper-slide {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: auto; /* Add this line to enable scrolling */
+    height: auto; /* Adjust height based on content */
+}
+
+.swiper-slide h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #262F0E;
+}
+
+.swiper-slide p {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.swiper-slide a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.swiper-slide a:hover {
+    text-decoration: underline;
+}
+
+
+
+
+        #home-content {
+            width: 45%; /* Adjust width as needed */
+            background-color: rgba(38, 47, 14, 0.9); /* Background color with transparency */
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        #home-content img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: absolute; /* Position the footer absolutely */
+            bottom: 0; /* Place the footer at the bottom */
+            width: 100%; /* Make the footer full width */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="statistics.html">Statistics</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="search.html">Search engine</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="news-feed">
+            <h2>Latest News on Plastic Pollution</h2>
+            <div class="swiper-container">
+                <div class="swiper-wrapper" id="news-container">
+                    <!-- News articles will be dynamically added here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <footer>
+        <p>&copy; 2024 Plastic Pollution Index</p>
+    </footer>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        // Function to display news articles
+        function displayNewsFeed(articles) {
+            const newsContainer = document.getElementById('news-container');
+            articles.forEach(article => {
+                const slide = document.createElement('div');
+                slide.classList.add('swiper-slide');
+                slide.innerHTML = `
+                    <h3>${article.title}</h3>
+                    <p>${article.description}</p>
+                    <a href="${article.url}" target="_blank">Read more</a>
+                `;
+                newsContainer.appendChild(slide);
+            });
+
+            // Initialize Swiper
+            const swiper = new Swiper('.swiper-container', {
+                slidesPerView: 'auto',
+                spaceBetween: 20,
+            });
+        }
+
+        // Your NewsAPI.org API key
+        const apiKey = 'f413ca35071f4e9bb6167887368290bd';
+
+        // Keyword search related to plastic pollution
+        const keyword = "plastic pollution";
+
+        // Construct the API URL
+        const apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(keyword)}&apiKey=${apiKey}`;
+
+        // Make the API request
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Extract and display news articles
+                const articles = data.articles;
+                displayNewsFeed(articles);
+            })
+            .catch(error => console.error('Error fetching news:', error));
+    </script>
+</body>
+</html>
+
+            

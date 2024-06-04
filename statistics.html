@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plastic Pollution Index - Statistics</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Additional CSS styles */
+        .region-menu {
+            margin-bottom: 20px;
+        }
+
+        .region-menu label, .region-menu select, .region-menu input, .region-menu button {
+            margin-right: 10px;
+        }
+
+        .graph-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html">PlastiSearch</a></li>
+                <li><a href="about.html">About Us</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="statistics">
+            <div class="region-menu">
+                <label for="region-select">Select Region:</label>
+                <select id="region-select">
+                    <option value="georgia">Georgia</option>
+                    <option value="california">California</option>
+                    <option value="new-york">New York</option>
+                    <!-- Add more options as needed -->
+                </select>
+                <input type="text" id="custom-region" placeholder="Type custom region">
+                <button id="add-region-btn">Add Region</button>
+            </div>
+            <div class="graph-container">
+                <canvas id="airQualityChart" width="800" height="400"></canvas>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Plastic Pollution Index</p>
+    </footer>
+
+    <script>
+        // JavaScript code goes here
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('airQualityChart').getContext('2d');
+            const airQualityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Air Quality Index',
+                        data: [],
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Function to fetch air quality data
+            function fetchAirQuality(region) {
+                const apiKey = '8c59fc25cdbade9a29d0957745f34863'; // Replace with your actual API key
+                const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?region=georgia&appid=8c59fc25cdbade9a29d0957745f34863`;
+
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const labels = Object.keys(data);
+                        const values = Object.values(data);
+
+                        airQualityChart.data.labels = labels;
+                        airQualityChart.data.datasets[0].data = values;
+                        airQualityChart.update();
+                    })
+                    .catch(error => console.error('Error fetching air quality data:', error));
+            }
+
+            // Initial fetch for default region
+            fetchAirQuality('georgia');
+
+            // Add event listener for the "Add Region" button
+            document.getElementById('add-region-btn').addEventListener('click', function() {
+                const customRegion = document.getElementById('custom-region').value;
+                const regionSelect = document.getElementById('region-select');
+                const option = document.createElement('option');
+                option.value = customRegion.toLowerCase();
+                option.textContent = customRegion;
+                regionSelect.appendChild(option);
+            });
+
+            // Add event listener for the region select
+            document.getElementById('region-select').addEventListener('change', function() {
+                const selectedRegion = this.value;
+                fetchAirQuality(selectedRegion);
+            });
+        });
+    </script>
+</body>
+</html>
