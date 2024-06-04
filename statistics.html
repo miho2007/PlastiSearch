@@ -65,14 +65,23 @@
                         label: 'Air Quality Index',
                         data: [],
                         fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
+                        borderColor: '#4CAF50', // Green color
+                        backgroundColor: '#4CAF50', // Green color
+                        pointBackgroundColor: '#4CAF50', // Green color
+                        pointBorderColor: '#4CAF50', // Green color
+                        pointHoverBackgroundColor: '#4CAF50', // Green color
+                        pointHoverBorderColor: '#4CAF50', // Green color
+                        borderWidth: 2, // Line width
+                        pointRadius: 5, // Point size
+                        pointHoverRadius: 7, // Point size on hover
+                        tension: 0.2 // Smooth curve
                     }]
                 },
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            suggestedMax: 300 // Maximum value on y-axis
                         }
                     }
                 }
@@ -80,33 +89,33 @@
 
             const apiKey = '8c59fc25cdbade9a29d0957745f34863'; // OpenWeatherMap API Key
 
-           // Function to fetch air quality data
-async function fetchAirQuality(region) {
-    try {
-        const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(region)}&limit=1&appid=${apiKey}`;
-        const geocodeResponse = await fetch(geocodeUrl);
-        const geocodeData = await geocodeResponse.json();
+            // Function to fetch air quality data
+            async function fetchAirQuality(region) {
+                try {
+                    const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(region)}&limit=1&appid=${apiKey}`;
+                    const geocodeResponse = await fetch(geocodeUrl);
+                    const geocodeData = await geocodeResponse.json();
 
-        if (!geocodeData || geocodeData.length === 0) {
-            throw new Error('Invalid region');
-        }
+                    if (!geocodeData || geocodeData.length === 0) {
+                        throw new Error('Invalid region');
+                    }
 
-        const { lat, lon } = geocodeData[0];
-        const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+                    const { lat, lon } = geocodeData[0];
+                    const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
 
-        const labels = data.list.map(entry => new Date(entry.dt * 1000).toLocaleDateString());
-        const values = data.list.map(entry => entry.main.aqi);
+                    const labels = data.list.map(entry => new Date(entry.dt * 1000).toLocaleDateString());
+                    const values = data.list.map(entry => entry.main.aqi);
 
-        airQualityChart.data.labels = labels;
-        airQualityChart.data.datasets[0].data = values;
-        airQualityChart.update();
-    } catch (error) {
-        console.error('Error fetching air quality data:', error);
-        alert('An error occurred while fetching air quality data. Please try again later.');
-    }
-}
+                    airQualityChart.data.labels = labels;
+                    airQualityChart.data.datasets[0].data = values;
+                    airQualityChart.update();
+                } catch (error) {
+                    console.error('Error fetching air quality data:', error);
+                    alert('An error occurred while fetching air quality data. Please try again later.');
+                }
+            }
 
             // Initial fetch for default region
             fetchAirQuality('Georgia, USA');
