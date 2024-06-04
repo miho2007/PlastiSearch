@@ -173,60 +173,34 @@
 // Function to display news articles
 function displayNewsFeed(articles) {
     const newsContainer = document.getElementById('news-container');
-    // Clear previous articles
-    newsContainer.innerHTML = '';
-    // Check if articles array is not empty
-    if (articles.length > 0) {
-        articles.forEach(article => {
-            const slide = document.createElement('div');
-            slide.classList.add('swiper-slide');
-            slide.innerHTML = `
-                <h3>${article.title}</h3>
-                <p>${article.description}</p>
-                <a href="${article.url}" target="_blank">Read more</a>
-            `;
-            newsContainer.appendChild(slide);
-        });
-        // Initialize Swiper
-        const swiper = new Swiper('.swiper-container', {
-            slidesPerView: 'auto',
-            spaceBetween: 20,
-        });
-    } else {
-        // Display message when no articles are available
+    articles.forEach(article => {
         const slide = document.createElement('div');
         slide.classList.add('swiper-slide');
         slide.innerHTML = `
-            <h3>No articles found</h3>
-            <p>There are no news articles available at the moment.</p>
+            <h3>${article.title}</h3>
+            <p>${article.description}</p>
+            <a href="${article.url}" target="_blank">Read more</a>
         `;
         newsContainer.appendChild(slide);
-    }
+    });
+
+    // Initialize Swiper
+    const swiper = new Swiper('.swiper-container', {
+        slidesPerView: 'auto',
+        spaceBetween: 20,
+    });
 }
 
-// Your NewsAPI.org API key
-const apiKey = 'f413ca35071f4e9bb6167887368290bd';
-
-// Keyword search related to plastic pollution
-const keyword = "plastic pollution";
-
-// Construct the API URL
-const apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(keyword)}&apiKey=${apiKey}`;
+// GNews API endpoint
+const apiUrl = 'https://gnews.io/api/v4/search?q=plastic%20pollution&token=b9991b6cd7effbf0a475f212f2ecdca6';
 
 // Make the API request
 fetch(apiUrl)
     .then(response => response.json())
     .then(data => {
-        // Check if the 'articles' array exists
-        if (data.articles && Array.isArray(data.articles)) {
-            // Extract and display news articles
-            const articles = data.articles;
-            displayNewsFeed(articles);
-        } else {
-            // Handle case where 'articles' array is undefined or not an array
-            console.error('No news articles found.');
-            // Display a message to the user or handle the absence of articles appropriately
-        }
+        // Extract and display news articles
+        const articles = data.articles;
+        displayNewsFeed(articles);
     })
     .catch(error => console.error('Error fetching news:', error));
 
