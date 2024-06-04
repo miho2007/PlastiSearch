@@ -23,11 +23,11 @@
 </head>
 <body>
     <header>
-        
+        <h1>Plastic Pollution Index</h1>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="search.html">PlastiSearch</a></li>
+                <li><a href="statistics.html">Statistics</a></li>
                 <li><a href="about.html">About Us</a></li>
             </ul>
         </nav>
@@ -37,9 +37,9 @@
             <div class="region-menu">
                 <label for="region-select">Select Region:</label>
                 <select id="region-select">
-                    <option value="georgia">Georgia</option>
-                    <option value="california">California</option>
-                    <option value="new-york">New York</option>
+                    <option value="Georgia, USA">Georgia</option>
+                    <option value="California, USA">California</option>
+                    <option value="New York, USA">New York</option>
                     <!-- Add more options as needed -->
                 </select>
                 <input type="text" id="custom-region" placeholder="Type custom region">
@@ -55,7 +55,6 @@
     </footer>
 
     <script>
-        // JavaScript code goes here
         document.addEventListener("DOMContentLoaded", function() {
             const ctx = document.getElementById('airQualityChart').getContext('2d');
             const airQualityChart = new Chart(ctx, {
@@ -79,35 +78,48 @@
                 }
             });
 
+            const apiKey = '8c59fc25cdbade9a29d0957745f34863'; // OpenWeatherMap API Key
+
             // Function to fetch air quality data
-            function fetchAirQuality(region) {
-                const apiKey = '8c59fc25cdbade9a29d0957745f34863'; // Replace with your actual API key
-                const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?region=georgia&appid=8c59fc25cdbade9a29d0957745f34863`;
+            async function fetchAirQuality(region) {
+                try {
+                    const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${region}&limit=1&appid=${apiKey}`;
+                    const geocodeResponse = await fetch(geocodeUrl);
+                    const geocodeData = await geocodeResponse.json();
 
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        const labels = Object.keys(data);
-                        const values = Object.values(data);
+                    if (!geocodeData.length) {
+                        throw new Error('Invalid region');
+                    }
 
-                        airQualityChart.data.labels = labels;
-                        airQualityChart.data.datasets[0].data = values;
-                        airQualityChart.update();
-                    })
-                    .catch(error => console.error('Error fetching air quality data:', error));
+                    const { lat, lon } = geocodeData[0];
+                    const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+
+                    const labels = data.list.map(entry => new Date(entry.dt * 1000).toLocaleDateString());
+                    const values = data.list.map(entry => entry.main.aqi);
+
+                    airQualityChart.data.labels = labels;
+                    airQualityChart.data.datasets[0].data = values;
+                    airQualityChart.update();
+                } catch (error) {
+                    console.error('Error fetching air quality data:', error);
+                }
             }
 
             // Initial fetch for default region
-            fetchAirQuality('georgia');
+            fetchAirQuality('Georgia, USA');
 
             // Add event listener for the "Add Region" button
             document.getElementById('add-region-btn').addEventListener('click', function() {
                 const customRegion = document.getElementById('custom-region').value;
                 const regionSelect = document.getElementById('region-select');
                 const option = document.createElement('option');
-                option.value = customRegion.toLowerCase();
+                option.value = customRegion;
                 option.textContent = customRegion;
                 regionSelect.appendChild(option);
+                regionSelect.value = customRegion;
+                fetchAirQuality(customRegion);
             });
 
             // Add event listener for the region select
