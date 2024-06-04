@@ -86,8 +86,6 @@
                     const geocodeResponse = await fetch(geocodeUrl);
                     const geocodeData = await geocodeResponse.json();
 
-                    console.log('Geocode data:', geocodeData); // Log the geocode data
-
                     if (!geocodeData || geocodeData.length === 0) {
                         throw new Error('Invalid region');
                     }
@@ -96,8 +94,6 @@
                     const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
                     const response = await fetch(apiUrl);
                     const data = await response.json();
-
-                    console.log('Air quality data:', data); // Log the air quality data
 
                     const labels = data.list.map(entry => new Date(entry.dt * 1000).toLocaleDateString());
                     const values = data.list.map(entry => entry.main.aqi);
@@ -132,4 +128,5 @@
     </script>
 </body>
 </html>
+
 
