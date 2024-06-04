@@ -191,18 +191,26 @@ function displayNewsFeed(articles) {
     });
 }
 
-// GNews API endpoint
-const apiUrl = 'https://gnews.io/api/v4/search?q=plastic%20pollution&token=b9991b6cd7effbf0a475f212f2ecdca6';
+// GNews API key
+const apiKey = 'b9991b6cd7effbf0a475f212f2ecdca6';
+
+// Construct the API URL
+const apiUrl = `https://gnews.io/api/v4/search?q=plastic%20pollution&token=${apiKey}&lang=en&max=10`;
 
 // Make the API request
 fetch(apiUrl)
     .then(response => response.json())
     .then(data => {
-        // Extract and display news articles
         const articles = data.articles;
-        displayNewsFeed(articles);
+
+        if (articles.length > 0) {
+            displayNewsFeed(articles);
+        } else {
+            console.log('No news articles found.');
+        }
     })
     .catch(error => console.error('Error fetching news:', error));
+
 
     </script>
 </body>
