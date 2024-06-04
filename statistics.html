@@ -83,7 +83,8 @@
             // Function to fetch air quality data
             async function fetchAirQuality(region) {
                 try {
-                    const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(region)}&limit=1&appid=${apiKey}`;
+                    const encodedRegion = encodeURIComponent(region);
+                    const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodedRegion}&limit=1&appid=${apiKey}`;
                     const geocodeResponse = await fetch(geocodeUrl);
                     const geocodeData = await geocodeResponse.json();
 
@@ -91,7 +92,7 @@
                         throw new Error('Invalid region');
                     }
 
-                    const { lat, lon } = geocodeData[0];
+                    const { lat, lon } = geocodeData[0]; // Destructuring here may fail if geocodeData[0] is undefined
                     const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
                     const response = await fetch(apiUrl);
                     const data = await response.json();
@@ -133,7 +134,4 @@
 </body>
 </html>
 
-    </script>
-</body>
-</html>
 
